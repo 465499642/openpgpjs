@@ -42,7 +42,7 @@ nacl.hash = bytes => new Uint8Array(sha512().update(bytes).digest());
  *            S: Uint8Array}}               Signature of the message
  * @async
  */
-async function sign(oid, hash_algo, message, publicKey, privateKey, hashed) {
+export async function sign(oid, hash_algo, message, publicKey, privateKey, hashed) {
   const secretKey = util.concatUint8Array([privateKey, publicKey.subarray(1)]);
   const signature = nacl.sign.detached(hashed, secretKey);
   // EdDSA signature params are returned in little-endian format
@@ -64,9 +64,7 @@ async function sign(oid, hash_algo, message, publicKey, privateKey, hashed) {
  * @returns {Boolean}
  * @async
  */
-async function verify(oid, hash_algo, { R, S }, m, publicKey, hashed) {
+export async function verify(oid, hash_algo, { R, S }, m, publicKey, hashed) {
   const signature = util.concatUint8Array([R, S]);
   return nacl.sign.detached.verify(hashed, signature, publicKey.subarray(1));
 }
-
-export default { sign, verify };

@@ -28,7 +28,7 @@
 import BN from 'bn.js';
 import enums from '../../../enums';
 import util from '../../../util';
-import Curve, { webCurves, privateToJwk, rawPublicToJwk } from './curves';
+import { Curve, webCurves, privateToJwk, rawPublicToJwk } from './curves';
 import { getIndutnyCurve, keyFromPrivate, keyFromPublic } from './indutnyKey';
 
 const webCrypto = util.getWebCrypto();
@@ -46,7 +46,7 @@ const nodeCrypto = util.getNodeCrypto();
  *            s: Uint8Array}}               Signature of the message
  * @async
  */
-async function sign(oid, hash_algo, message, publicKey, privateKey, hashed) {
+export async function sign(oid, hash_algo, message, publicKey, privateKey, hashed) {
   const curve = new Curve(oid);
   if (message && !util.isStream(message)) {
     const keyPair = { publicKey, privateKey };
@@ -85,7 +85,7 @@ async function sign(oid, hash_algo, message, publicKey, privateKey, hashed) {
  * @returns {Boolean}
  * @async
  */
-async function verify(oid, hash_algo, signature, message, publicKey, hashed) {
+export async function verify(oid, hash_algo, signature, message, publicKey, hashed) {
   const curve = new Curve(oid);
   if (message && !util.isStream(message)) {
     switch (curve.type) {
@@ -104,8 +104,6 @@ async function verify(oid, hash_algo, signature, message, publicKey, hashed) {
   const digest = (typeof hash_algo === 'undefined') ? message : hashed;
   return ellipticVerify(curve, signature, digest, publicKey);
 }
-
-export default { sign, verify, ellipticVerify, ellipticSign };
 
 
 //////////////////////////

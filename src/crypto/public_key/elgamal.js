@@ -23,46 +23,44 @@
  */
 
 import BN from 'bn.js';
-import random from '../random';
+import { getRandomBN } from '../random';
 
 const zero = new BN(0);
 
-export default {
-  /**
-   * ElGamal Encryption function
-   * @param {BN} m
-   * @param {BN} p
-   * @param {BN} g
-   * @param {BN} y
-   * @returns {{ c1: BN, c2: BN }}
-   * @async
-   */
-  encrypt: async function(m, p, g, y) {
-    const redp = new BN.red(p);
-    const mred = m.toRed(redp);
-    const gred = g.toRed(redp);
-    const yred = y.toRed(redp);
-    // See Section 11.5 here: https://crypto.stanford.edu/~dabo/cryptobook/BonehShoup_0_4.pdf
-    const k = await random.getRandomBN(zero, p); // returns in [0, p-1]
-    return {
-      c1: gred.redPow(k).fromRed(),
-      c2: yred.redPow(k).redMul(mred).fromRed()
-    };
-  },
+/**
+ * ElGamal Encryption function
+ * @param {BN} m
+ * @param {BN} p
+ * @param {BN} g
+ * @param {BN} y
+ * @returns {{ c1: BN, c2: BN }}
+ * @async
+ */
+export async function encrypt(m, p, g, y) {
+  const redp = new BN.red(p);
+  const mred = m.toRed(redp);
+  const gred = g.toRed(redp);
+  const yred = y.toRed(redp);
+  // See Section 11.5 here: https://crypto.stanford.edu/~dabo/cryptobook/BonehShoup_0_4.pdf
+  const k = await getRandomBN(zero, p); // returns in [0, p-1]
+  return {
+    c1: gred.redPow(k).fromRed(),
+    c2: yred.redPow(k).redMul(mred).fromRed()
+  };
+}
 
-  /**
-   * ElGamal Encryption function
-   * @param {BN} c1
-   * @param {BN} c2
-   * @param {BN} p
-   * @param {BN} x
-   * @returns BN
-   * @async
-   */
-  decrypt: async function(c1, c2, p, x) {
-    const redp = new BN.red(p);
-    const c1red = c1.toRed(redp);
-    const c2red = c2.toRed(redp);
-    return c1red.redPow(x).redInvm().redMul(c2red).fromRed();
-  }
-};
+/**
+ * ElGamal Encryption function
+ * @param {BN} c1
+ * @param {BN} c2
+ * @param {BN} p
+ * @param {BN} x
+ * @returns BN
+ * @async
+ */
+export async function decrypt(c1, c2, p, x) {
+  const redp = new BN.red(p);
+  const c1red = c1.toRed(redp);
+  const c2red = c2.toRed(redp);
+  return c1red.redPow(x).redInvm().redMul(c2red).fromRed();
+}

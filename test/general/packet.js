@@ -297,7 +297,7 @@ module.exports = () => describe("Packet", function() {
         '=VZ0/\n' +
         '-----END PGP MESSAGE-----';
 
-    const msgbytes = (await openpgp.armor.decode(msg)).data;
+    const msgbytes = (await openpgp.unarmor(msg)).data;
 
     const parsed = new openpgp.PacketList();
     await parsed.read(msgbytes, openpgp);
@@ -372,7 +372,7 @@ module.exports = () => describe("Packet", function() {
         '-----END PGP PRIVATE KEY BLOCK-----';
 
     let key = new openpgp.PacketList();
-    await key.read((await openpgp.armor.decode(armored_key)).data, openpgp);
+    await key.read((await openpgp.unarmor(armored_key)).data, openpgp);
     key = key[0];
 
     const enc = new openpgp.PublicKeyEncryptedSessionKeyPacket();
@@ -439,11 +439,11 @@ module.exports = () => describe("Packet", function() {
         '-----END PGP MESSAGE-----';
 
     let key = new openpgp.PacketList();
-    await key.read((await openpgp.armor.decode(armored_key)).data, openpgp);
+    await key.read((await openpgp.unarmor(armored_key)).data, openpgp);
     key = key[3];
 
     const msg = new openpgp.PacketList();
-    await msg.read((await openpgp.armor.decode(armored_msg)).data, openpgp);
+    await msg.read((await openpgp.unarmor(armored_msg)).data, openpgp);
 
     return msg[0].decrypt(key).then(async () => {
       await msg[1].decrypt(msg[0].sessionKeyAlgorithm, msg[0].sessionKey);
@@ -690,12 +690,12 @@ module.exports = () => describe("Packet", function() {
         '-----END PGP MESSAGE-----';
 
     let key = new openpgp.PacketList();
-    await key.read((await openpgp.armor.decode(armored_key)).data, openpgp);
+    await key.read((await openpgp.unarmor(armored_key)).data, openpgp);
     key = key[3];
     await key.decrypt('test');
 
     const msg = new openpgp.PacketList();
-    await msg.read((await openpgp.armor.decode(armored_msg)).data, openpgp);
+    await msg.read((await openpgp.unarmor(armored_msg)).data, openpgp);
 
     return msg[0].decrypt(key).then(async () => {
       await msg[1].decrypt(msg[0].sessionKeyAlgorithm, msg[0].sessionKey);
@@ -708,7 +708,7 @@ module.exports = () => describe("Packet", function() {
 
   it('Secret key reading with signature verification.', async function() {
     const key = new openpgp.PacketList();
-    await key.read((await openpgp.armor.decode(armored_key)).data, openpgp);
+    await key.read((await openpgp.unarmor(armored_key)).data, openpgp);
     return Promise.all([
       expect(key[2].verify(key[0],
         openpgp.enums.signature.certGeneric,
@@ -743,11 +743,11 @@ module.exports = () => describe("Packet", function() {
         '-----END PGP MESSAGE-----';
 
     const key = new openpgp.PacketList();
-    await key.read((await openpgp.armor.decode(armored_key)).data, openpgp);
+    await key.read((await openpgp.unarmor(armored_key)).data, openpgp);
     await key[3].decrypt('test');
 
     const msg = new openpgp.PacketList();
-    await msg.read((await openpgp.armor.decode(armored_msg)).data, openpgp);
+    await msg.read((await openpgp.unarmor(armored_msg)).data, openpgp);
 
     return msg[0].decrypt(key[3]).then(async () => {
       await msg[1].decrypt(msg[0].sessionKeyAlgorithm, msg[0].sessionKey);
